@@ -2,9 +2,7 @@
 
 A content pipeline that shows its working. Three AI agents (research, drafting and QA) check each other, code verifies anything code can verify, and a person gets anything the system can't resolve. Built in n8n with OpenAI, Tavily and Airtable.
 
-**Demo video:** add your Loom link here
-
-**Status:** demo project, tested locally. Not production-hardened: see [What it can't do yet](#what-it-cant-do-yet).
+**Demo video:** [Watch the demo](https://www.loom.com/share/4a99b33d59d2493a883c270e3319bcdb)
 
 ![The orchestrator workflow in n8n](docs/canvas-orchestrator.png)
 
