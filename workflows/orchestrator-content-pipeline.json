@@ -1,0 +1,1111 @@
+{
+  "name": "Orchestrator - Content Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4d0c9b9-1349-4eaf-8f40-d2b612c275be",
+              "name": "topic",
+              "value": "={{ $json.body.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "7624f356-e8f2-42d6-b90a-864029f7a3fd",
+              "name": "brief",
+              "value": "={{ $json.body.brief }}",
+              "type": "string"
+            },
+            {
+              "id": "598c9d01-2cd8-4e86-8d51-ef7863779c51",
+              "name": "revision_count",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4fab670f-fff4-4bc0-b3e0-a2e532bef1ef",
+      "name": "Init Input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "907add15-cddc-4a5a-92f5-2cbc0e9d42be",
+              "leftValue": "={{ $json.topic_supported }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        640,
+        0
+      ],
+      "id": "8a85ed73-0d42-4668-ad42-743485498ee8",
+      "name": "Topic Supported?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21140341-1312-4d98-ab92-8c2f56195b70",
+              "name": "status",
+              "value": "insufficient_research",
+              "type": "string"
+            },
+            {
+              "id": "d2066e8e-aa03-43ed-89fd-3ed0a101671c",
+              "name": "topic",
+              "value": "={{ $json.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "d8712d82-bcbe-4a45-a7f9-baed67947cca",
+              "name": "reason",
+              "value": "={{ $json.gaps.join('; ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        560,
+        576
+      ],
+      "id": "5bebc2e7-1501-46e9-9c93-4c4284376828",
+      "name": "Insufficient Research Result"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "y7uc4gEjO2q1Bzaj",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/y7uc4gEjO2q1Bzaj",
+          "cachedResultName": "Agent - Drafting (P5)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "topic": "={{ $('Call Research Agent').item.json.topic }}",
+            "brief": "={{ $('Init Input').item.json.brief }}",
+            "findings": "={{ $('Call Research Agent').item.json.findings }}",
+            "gaps": "={{ $('Call Research Agent').item.json.gaps }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "brief",
+              "displayName": "brief",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "findings",
+              "displayName": "findings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array"
+            },
+            {
+              "id": "gaps",
+              "displayName": "gaps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array"
+            },
+            {
+              "id": "revision_notes",
+              "displayName": "revision_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "previous_draft",
+              "displayName": "previous_draft",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        976,
+        -16
+      ],
+      "id": "039d2cea-f9c9-4d1d-b685-afc58f61600e",
+      "name": "Call Drafting Agent (1st pass)"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "GgcuG4zilhS0cwTb",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/GgcuG4zilhS0cwTb",
+          "cachedResultName": "Agent - Research (P5)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "topic": "={{ $json.topic }}",
+            "brief": "={{ $json.brief }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "brief",
+              "displayName": "brief",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        0
+      ],
+      "id": "f39bab76-be78-4d00-9249-04a4773167bd",
+      "name": "Call Research Agent"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "z8IC87nHAx3H6rum",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/z8IC87nHAx3H6rum",
+          "cachedResultName": "Agent - QA (P5)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "topic": "={{ $('Call Research Agent').item.json.topic }}",
+            "brief": "={{ $('Init Input').item.json.brief }}",
+            "draft": "={{ $json.draft }}",
+            "sources_used": "={{ $json.sources_used }}",
+            "findings": "={{ $('Call Research Agent').item.json.findings }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "brief",
+              "displayName": "brief",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "draft",
+              "displayName": "draft",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "findings",
+              "displayName": "findings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array"
+            },
+            {
+              "id": "sources_used",
+              "displayName": "sources_used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1328,
+        -16
+      ],
+      "id": "f9c9f2f1-168c-4094-80fd-7d2310849a68",
+      "name": "Call QA Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a9486f2c-8c82-443a-ab67-bd8f1c5d9e9e",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1696,
+        -16
+      ],
+      "id": "1bb181b0-26c7-4068-9e03-d5bbe6d506ff",
+      "name": "Approved?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ccab4e1-a5fb-41b4-9a57-4c2b8244f9bd",
+              "name": "status",
+              "value": "approved",
+              "type": "string"
+            },
+            {
+              "id": "ca0152eb-648d-4e82-bcc9-455759615bd6",
+              "name": "topic",
+              "value": "={{ $('Call Research Agent').item.json.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "834ffebe-263a-4d7a-9f29-867238a29b8e",
+              "name": "final_draft",
+              "value": "={{ $('Call Drafting Agent (revision)').isExecuted ? $('Call Drafting Agent (revision)').last().json.draft : $('Call Drafting Agent (1st pass)').first().json.draft }}",
+              "type": "string"
+            },
+            {
+              "id": "029afee2-419d-4efa-95d2-56dd379ede2e",
+              "name": "revision_count",
+              "value": "={{ $json.revision_count }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2048,
+        -32
+      ],
+      "id": "cba61588-5e80-40b0-bfde-80838e8f649e",
+      "name": "Final Result"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bfb42aeb-8597-4927-8af5-5c5157439053",
+              "leftValue": "={{ $json.revision_count }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1600,
+        208
+      ],
+      "id": "35762dcd-e304-4f3e-a93e-ce4b5da5cc5c",
+      "name": "Revision Limit Reached?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "78b12724-d5de-4761-b9cb-e3f72e8df3cf",
+              "name": "status",
+              "value": "needs_human_review",
+              "type": "string"
+            },
+            {
+              "id": "ab609580-0765-40e9-8466-8a7d286fba1f",
+              "name": "topic",
+              "value": "={{ $('Call Research Agent').item.json.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "e6c4ff17-7d9f-4504-8f6a-9450884de802",
+              "name": "final_draft",
+              "value": "={{ $('Call Drafting Agent (revision)').last().json.draft }}",
+              "type": "string"
+            },
+            {
+              "id": "96f4b92e-4cd0-4098-94a6-82906becdc9b",
+              "name": "last_issues",
+              "value": "={{ $json.issues }}",
+              "type": "array"
+            },
+            {
+              "id": "4792edbb-87da-48e3-836e-bfaef181e062",
+              "name": "revision_count",
+              "value": "={{ $json.revision_count }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2048,
+        192
+      ],
+      "id": "f5dec366-6c58-45fc-bdb5-ad9cc0deffc7",
+      "name": "Needs Human Review"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e544a875-7cb2-4a15-ac5f-a2ce6e624bb6",
+              "name": "revision_count",
+              "value": "={{ $json.revision_count + 1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1744,
+        384
+      ],
+      "id": "a64c7305-403f-442b-ba4c-012ac2488152",
+      "name": "Increment Revision Count"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "y7uc4gEjO2q1Bzaj",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/y7uc4gEjO2q1Bzaj",
+          "cachedResultName": "Agent - Drafting (P5)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "topic": "={{ $('Call Research Agent').item.json.topic }}",
+            "brief": "={{ $('Init Input').item.json.brief }}",
+            "findings": "={{ $('Call Research Agent').item.json.findings }}",
+            "gaps": "={{ $('Call Research Agent').item.json.gaps }}",
+            "previous_draft": "={{ $('Call Drafting Agent (1st pass)').item.json.draft }}",
+            "revision_notes": "={{ $('Call QA Agent').item.json.revision_notes }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "brief",
+              "displayName": "brief",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "findings",
+              "displayName": "findings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array"
+            },
+            {
+              "id": "gaps",
+              "displayName": "gaps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array"
+            },
+            {
+              "id": "revision_notes",
+              "displayName": "revision_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "previous_draft",
+              "displayName": "previous_draft",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1392,
+        176
+      ],
+      "id": "3ae15773-d9ae-4d3a-8d89-c0bf7c9efb88",
+      "name": "Call Drafting Agent (revision)"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content-pipeline",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        0
+      ],
+      "id": "8e36c59c-7dd1-49b4-a5d9-640a819d65cd",
+      "name": "Webhook",
+      "webhookId": "6d2f6351-72b9-473e-9668-ea0e4515ecf7"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2288,
+        -32
+      ],
+      "id": "207c8d73-070c-45e8-9b47-faa8ad205beb",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2304,
+        192
+      ],
+      "id": "e0df42a8-088c-4b09-8bf9-0b2090737eca",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2160,
+        576
+      ],
+      "id": "1b0808f5-5434-441c-83a6-a9670a9cf07e",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline Runs",
+          "cachedResultUrl": "https://airtable.com/YOUR_BASE_ID"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/YOUR_BASE_ID/YOUR_TABLE_ID"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "={{ $json.status }}",
+            "revision_count": "={{ $json.revision_count ?? 0 }}",
+            "final_draft": "={{ $json.final_draft ?? '' }}",
+            "last_issues": "={{ $json.last_issues ? JSON.stringify($json.last_issues) : '' }}",
+            "reason": "={{ $json.reason ?? '' }}",
+            "topic": "={{ $json.topic }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "revision_count",
+              "displayName": "revision_count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "final_draft",
+              "displayName": "final_draft",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "last_issues",
+              "displayName": "last_issues",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created",
+              "displayName": "created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2656,
+        128
+      ],
+      "id": "39ab5c03-88dd-48ac-8514-01a4961071d7",
+      "name": "Log Run",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "B7V5gM0dzolGyNgw",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f917bcc6-a042-4d34-b32a-e3b7ecbc9fe6",
+              "name": "revision_count",
+              "value": "={{ $('Increment Revision Count').isExecuted ? $('Increment Revision Count').last().json.revision_count : $('Init Input').last().json.revision_count }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1520,
+        -16
+      ],
+      "id": "6b36ce98-cf81-40bb-bcbc-dc492e32906e",
+      "name": "Carry State"
+    },
+    {
+      "parameters": {
+        "content": "## 1. Intake\nWebhook receives the topic and brief as a POST request.\nInit Input extracts them and sets the revision counter to 0.",
+        "height": 336,
+        "width": 368,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -160
+      ],
+      "id": "adcb7358-d9cd-4cd9-858f-67e183714eea",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Research gate\nThe Research Agent searches the web. Code then checks every quote against the raw search results.\nNo verified evidence: stop here, log it and tell the caller.",
+        "height": 928,
+        "width": 464,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -160
+      ],
+      "id": "6e12dd58-1945-4c6d-b8b4-dc7a980cdb97",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 3. Draft\nThe Drafting Agent writes only from the verified findings, with numbered citations.",
+        "height": 336,
+        "width": 352,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -160
+      ],
+      "id": "23895f33-667c-4557-b091-0f5250314c37",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 4. QA and revision loop (max 2)\nThe QA Agent checks the draft against the findings. Code checks that the References section is present.\nRejected: notes go back to the Drafting Agent.\nThe counter caps revisions at 2. Carry State keeps the count alive between loops.",
+        "height": 800,
+        "width": 736
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        -208
+      ],
+      "id": "a1fb05ed-99e4-40e9-94fa-65704d8ad56b",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 5. Outcomes and logging\nApproved: return the draft.\nCap reached: flag for human review.\nEvery run returns JSON to the caller and is logged to Airtable.",
+        "height": 944,
+        "width": 864,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1968,
+        -208
+      ],
+      "id": "407e2112-4c14-4b5d-9823-c406e376cb02",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Init Input": {
+      "main": [
+        [
+          {
+            "node": "Call Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Topic Supported?": {
+      "main": [
+        [
+          {
+            "node": "Call Drafting Agent (1st pass)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insufficient Research Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Topic Supported?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Drafting Agent (1st pass)": {
+      "main": [
+        [
+          {
+            "node": "Call QA Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call QA Agent": {
+      "main": [
+        [
+          {
+            "node": "Carry State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Final Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revision Limit Reached?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Result": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revision Limit Reached?": {
+      "main": [
+        [
+          {
+            "node": "Needs Human Review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Increment Revision Count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Revision Count": {
+      "main": [
+        [
+          {
+            "node": "Call Drafting Agent (revision)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Drafting Agent (revision)": {
+      "main": [
+        [
+          {
+            "node": "Call QA Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Init Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Human Review": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insufficient Research Result": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Log Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Log Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Log Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Carry State": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ec7cc74e-6411-40fa-b3a5-1421cb7b5891",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "21610be9a4b3cba3604d42406e08217183f0bf9b2b7e460efbc4b30d7529f65b"
+  },
+  "nodeGroups": [],
+  "id": "H5iqqhwy89bLTbjd",
+  "tags": []
+}

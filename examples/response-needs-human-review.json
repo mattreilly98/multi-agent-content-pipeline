@@ -1,0 +1,18 @@
+{
+  "status": "needs_human_review",
+  "topic": "How small businesses use AI for invoice processing",
+  "final_draft": "# How Small Businesses Use AI for Invoice Processing\n\nFor small business owners, managing invoices can be time-consuming and prone to errors. Fortunately, artificial intelligence (AI) offers practical solutions to streamline this process.\n\n## Practical Benefits\n\nAI technology can scan incoming invoices and automatically extract key information such as vendor names, amounts, dates, and detailed line items. This automation involves the AI scanning and extracting essential fields from invoices to assist with data entry tasks.[1]\n\n## Potential Risks\n\nWhile the research mainly highlights AI's data extraction abilities, it is important for small business owners to be mindful of potential risks such as data security and the accuracy of the AI's extraction. Ensuring that AI tools are from reputable providers and regularly monitored can help mitigate these risks.\n\n## Conclusion\n\nUsing AI for invoice processing offers a practical advantage by automating the extraction of key invoice data. Small business owners should weigh these benefits against potential risks and choose solutions that best fit their needs.\n\n### References\n\n[1] Kicks Digital Marketing. (2026, May 14). AI Invoice Processing for Small Business: Automate 90% of Tasks. Retrieved from https://kicksdigitalmarketing.com/2026/05/14/ai-invoice-processing-for-small-business-automate-90-of-tasks\n",
+  "last_issues": [
+    {
+      "type": "citation_integrity",
+      "detail": "The citation marker [1] in the draft points to a source URL dated 2026, which is a future date and may not be verifiable or current as required by the brief.",
+      "quoted_text": "[1] Kicks Digital Marketing. (2026, May 14). AI Invoice Processing for Small Business: Automate 90% of Tasks. Retrieved from https://kicksdigitalmarketing.com/2026/05/14/ai-invoice-processing-for-small-business-automate-90-of-tasks"
+    },
+    {
+      "type": "brief_coverage",
+      "detail": "The draft mentions potential risks like data security and accuracy but these risks are not supported or detailed by the single provided research finding, which only discusses AI's extraction capabilities, thus lacking current, verifiable information about practical risks as requested by the brief.",
+      "quoted_text": "Potential Risks\n\nWhile the research mainly highlights AI's data extraction abilities, it is important for small business owners to be mindful of potential risks such as data security and the accuracy of the AI's extraction. Ensuring that AI tools are from reputable providers and regularly monitored can help mitigate these risks."
+    }
+  ],
+  "revision_count": 2
+}

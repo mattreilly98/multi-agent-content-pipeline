@@ -1,0 +1,247 @@
+{
+  "name": "Agent - QA",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "topic"
+            },
+            {
+              "name": "brief"
+            },
+            {
+              "name": "draft"
+            },
+            {
+              "name": "findings",
+              "type": "array"
+            },
+            {
+              "name": "sources_used",
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c9685270-ce60-4549-b554-d3783a705698",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic: {{ $json.topic }}\n\nContent brief: {{ $json.brief }}\n\nDraft to review:\n{{ $json.draft }}\n\nResearch findings used (JSON):\n{{ JSON.stringify($json.findings, null, 2) }}\n\nSources the draft claims to use:\n{{ JSON.stringify($json.sources_used) }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a QA reviewer in a content production pipeline. You review a draft that another agent wrote, checking it against the research findings it was supposed to be based on. You do not rewrite the draft yourself.\n\n## Your task\nCheck the draft against the findings and the brief. Decide whether it is ready to publish, or needs revision.\n\n## What to check\n1. Factual accuracy: for every claim or statistic in the draft, confirm it is supported by one of the provided findings. A claim that goes beyond its matching finding — adds a cause, a mechanism, a specific detail, or a number the finding doesn't state — counts as unsupported. Example: if a finding says data is extracted \"with high accuracy,\" a draft claim that this \"minimizes manual entry errors\" goes beyond what the finding states and must be flagged, even though it sounds like a reasonable inference.\n2. Citation integrity: every [n] marker in the draft must correspond to a finding whose source_url is at position n in sources_used, counting from 1 (so [1] is the first URL in the list, [2] the second, and so on).\n3. Brief coverage: check whether the draft actually covers what the brief asked for (for example, both benefits and risks if both were requested).\n4. Structural completeness: flag if a References/sources section is missing from the draft text, if citation markers appear with no matching reference, or if the draft is empty despite findings being present.\n5. Tone and audience fit: flag only clear mismatches with the stated audience, not stylistic preferences.\n6. Source cross-check: every URL in sources_used must appear, verbatim, in a References or Sources section at the end of the draft text, matched to its [n] marker. If any URL in sources_used is missing from the draft text, this is a structural issue and approved must be false.\n\n## Rules\n- Do not invent problems. Only flag something you can point to specifically, quoting the draft text and explaining what's wrong with it.\n- Be specific enough that a drafting agent could act on each issue without guessing. \"Improve clarity\" is not usable feedback; \"the claim about reduced manual entry errors in paragraph 1 is not supported by finding [1], which only discusses extraction accuracy and compliance\" is.\n- approved must be false if there is at least one factual accuracy or citation integrity issue. Tone or coverage issues alone can still result in approved if they are minor.\n- revision_notes should be a short, direct set of instructions a drafting agent can follow, covering only the issues you found. Empty string if approved.\n- If approved is false, issues must contain at least one entry explaining why. If approved is true, issues must be empty.\n- Every entry in issues must describe an actual problem. Do not include checks that passed (\"no mismatch found\", \"matches correctly\") as entries — if you check something and find no problem, simply don't add an entry for it.\n- Every problem mentioned in revision_notes must have a matching entry in issues. revision_notes is a summary for the drafting agent; issues is the structured record of what's wrong. They must agree.\n- A missing References/Sources section, or a sources_used URL that doesn't appear in the draft text, is always type \"structural\", not citation_integrity.\n- Do not reject a source for its date unless it is later than today’s date.\n- Do not raise issues about a source's publication date, recency, or whether information is 'current'. You cannot verify dates and the pipeline does not check them. Only judge whether claims are supported by the findings, whether citations match their findings, and whether the topics in the brief are covered.\n\n## Output\nReturn the structured format only: approved (boolean), issues (array of objects with type, detail, and the quoted draft text), revision_notes (string)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b5a39a34-54f9-4ffc-82f2-a055536036b9",
+      "name": "AI Agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"approved\": {\n      \"type\": \"boolean\",\n      \"description\": \"False if there is any factual accuracy or citation integrity issue.\"\n    },\n    \"issues\": {\n      \"type\": \"array\",\n      \"description\": \"Specific, actionable problems found. Empty if none.\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"type\": {\n            \"type\": \"string\",\n            \"description\": \"One of: factual_accuracy, citation_integrity, brief_coverage, structural, tone.\"\n          },\n          \"detail\": {\n            \"type\": \"string\",\n            \"description\": \"Specific explanation of the problem, referencing the exact draft text and, where relevant, which finding it conflicts with.\"\n          },\n          \"quoted_text\": {\n            \"type\": \"string\",\n            \"description\": \"The exact text from the draft this issue refers to. Use an empty string if the problem is something missing.\"\n          }\n        },\n        \"required\": [\"type\", \"detail\"]\n      }\n    },\n    \"revision_notes\": {\n      \"type\": \"string\",\n      \"description\": \"Direct, actionable instructions for the drafting agent covering only the issues found. Empty string if approved.\"\n    }\n  },\n  \"required\": [\"approved\", \"issues\", \"revision_notes\"]\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        160
+      ],
+      "id": "a6603dfa-e13c-4308-b265-90bfdef1090a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        192
+      ],
+      "id": "a8194540-9649-4895-8d1b-4a60c8d02631",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zfmUKBDqaZHPwST1",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        272
+      ],
+      "id": "9e3a53ca-8220-4193-8baf-e51af0bbfb6e",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "zfmUKBDqaZHPwST1",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## QA agent\nThe model checks every claim and citation against the findings.\nCode enforces the structural check: every cited URL must appear in the draft's References section.\nWhy code? The model alone missed this check in testing.",
+        "height": 544,
+        "width": 784,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -144
+      ],
+      "id": "5d8b695a-f9c6-4c01-9e8f-0228f705ece7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst out = item.output;\nconst trigger = $('When Executed by Another Workflow').first().json;\nconst draft = trigger.draft;\nconst sourcesUsed = trigger.sources_used || [];\nconst today = $now.toFormat('yyyy-MM-dd');\nconst thisYear = Number($now.toFormat('yyyy'));\n\n// 1. Drop date or recency complaints that code can disprove\nconst datePhrases = /future|today['’]?s date|time relevance|timeliness|recency|publication date|dated in|dated on|date of publication/i;\nlet droppedDateIssues = 0;\nconst issues = [];\nfor (const issue of (out.issues || [])) {\n  const text = `${issue.detail ?? ''} ${issue.quoted_text ?? ''}`;\n  const years = (text.match(/\\b20\\d{2}\\b/g) || []).map(Number);\n  const isoDates = text.match(/\\b\\d{4}-\\d{2}-\\d{2}\\b/g) || [];\n  const hasFutureDate = isoDates.some(d => d > today) || years.some(y => y > thisYear);\n  if (datePhrases.test(text) && years.length > 0 && !hasFutureDate) {\n    droppedDateIssues++;\n    continue;\n  }\n  issues.push(issue);\n}\n\nlet approved = out.approved;\nlet revisionNotes = out.revision_notes || '';\nif (droppedDateIssues > 0) {\n  if (issues.length === 0) approved = true;\n  revisionNotes = issues.map(i => i.detail).join(' ');\n}\n\n// 2. Structural check: every cited URL must appear in the draft text\nconst missingFromDraft = sourcesUsed.filter(url => !draft.includes(url));\nif (missingFromDraft.length > 0) {\n  approved = false;\n  issues.push({\n    type: 'structural',\n    detail: `The draft is missing a References/Sources section, or it does not list the following cited URL(s) verbatim: ${missingFromDraft.join(', ')}.`,\n    quoted_text: ''\n  });\n  revisionNotes = [revisionNotes, `Add a References section listing: ${missingFromDraft.join(', ')}.`].filter(Boolean).join(' ');\n}\nif (approved) revisionNotes = '';\n\nreturn [{\n  json: {\n    topic: trigger.topic,\n    approved,\n    issues,\n    revision_notes: revisionNotes,\n    dropped_date_issues: droppedDateIssues\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        0
+      ],
+      "id": "b4a8eb2e-badd-407f-87d8-ede3b147bd68",
+      "name": "Structural Check"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "topic": "How small businesses use AI for invoice processing",
+          "brief": "Audience: non-technical small business owners. Angle: practical benefits. Need current, verifiable info.",
+          "draft": "# How AI Helps With Invoice Processing\n\nAI invoice software can automatically extract key invoice data, which reduces manual data entry [1].\n\n### References\n\n[1] Kicks Digital Marketing. (2026, May 14). AI Invoice Processing for Small Business. https://kicksdigitalmarketing.com/2026/05/14/ai-invoice-processing-for-small-business-automate-90-of-tasks\n",
+          "findings": [
+            {
+              "claim": "AI invoice software can automatically extract key invoice data, reducing manual data entry.",
+              "detail": "Automatic extraction cuts the time spent typing invoice details.",
+              "evidence": "AI invoice processing software automatically extracts key data from invoices, which reduces manual data entry.",
+              "source_url": "https://kicksdigitalmarketing.com/2026/05/14/ai-invoice-processing-for-small-business-automate-90-of-tasks"
+            }
+          ],
+          "sources_used": [
+            "https://kicksdigitalmarketing.com/2026/05/14/ai-invoice-processing-for-small-business-automate-90-of-tasks"
+          ]
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Structural Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f4dab0f7-ae7a-44b2-a8b8-fa05719193a9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "21610be9a4b3cba3604d42406e08217183f0bf9b2b7e460efbc4b30d7529f65b"
+  },
+  "nodeGroups": [],
+  "id": "z8IC87nHAx3H6rum",
+  "tags": []
+}
